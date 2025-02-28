@@ -1,6 +1,6 @@
 import numpy as np
 import plotly.graph_objects as go
-from scipy.stats import beta
+from scipy.stats import beta, binom
 
 # Function to generate synthetic observations X given success rate p
 def generate_observations(p, N, seed):
@@ -362,4 +362,42 @@ def create_MC_fig(max_obs, true_p, mean_prior, strength_prior, alpha_prior, beta
         )
     )
 
+    return fig
+
+# Create the likelihood figure
+def create_likelihood_fig(p, N):
+    # Create a bar chart showing the likelihood of different observed success rates given a true success rate
+    x = np.arange(1, N+1)
+    y = np.array([binom.pmf(k, N, p) for k in x])
+    fig = go.Figure()
+    fig.add_trace(go.Bar(
+        x=x,
+        y=y,
+        marker=dict(color='blue'),
+        # line color
+        marker_line_color='blue',
+        showlegend=False
+    ))
+    fig.add_vline(
+        x=N*p, 
+        line_dash="dash", 
+        line_color="orange", 
+        annotation_text="Expected Successes", 
+        annotation_position="bottom right",
+        annotation_font=dict(color="orange")
+    )
+    fig.update_layout(
+        title='Likelihood of Observed Success Rate',
+        xaxis_title='Number of Successes',
+        yaxis_title='Probability',
+        # height=200,
+        # yaxis=dict(visible=False),
+        legend=dict(
+            orientation='h',
+            yanchor='bottom',
+            y=1.02,
+            xanchor='right',
+            x=1
+        ),
+    )
     return fig

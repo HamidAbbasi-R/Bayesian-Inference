@@ -1,8 +1,5 @@
 import streamlit as st
 import numpy as np
-import plotly.graph_objects as go
-from scipy.stats import beta, norm
-import pandas as pd
 import utils
 
 # User inputs
@@ -119,6 +116,17 @@ For example:
 - Set $ N = 100 $ to simulate 100 trials.
 - Increase $ N $ to see how more data reduces uncertainty in the posterior distribution.
 - Decrease $ N $ to observe the impact of limited data on the estimation process.
+            
+Also you can see the likelihood function for the given true success rate and number of trials.
+It is computed using binomial distribution.
+            
+$$
+P(X \mid p) = \\binom{N}{k} p^k (1-p)^{N-k},
+$$
+where:
+- $ N $: Total number of trials.
+- $ k $: Number of successes.
+- $ p $: True success rate.
 """)
 
 # Generate synthetic observations
@@ -126,6 +134,9 @@ X = utils.generate_observations(true_p, N, seed)
 k = np.sum(X)  # Number of successes
 
 st.plotly_chart(utils.plot_observations(X))
+
+st.plotly_chart(utils.create_likelihood_fig(true_p, N))
+
 
 st.subheader("3. Controlling Randomness with the Seed")
 st.markdown("""
