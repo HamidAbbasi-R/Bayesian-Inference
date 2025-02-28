@@ -93,11 +93,13 @@ This figure shows the observed data, where each point represents a binary outcom
 ![Likelihood Function](imgs/likelihood_function.png)
 
 **Discussion**:  
-The likelihood function represents the probability of observing the data given a specific value of $ p $. It is computed using the binomial distribution:
+The likelihood function represents the probability of observing the data given a specific value of $p$. It is computed using the binomial distribution:
+
 $$
 P(X \mid p) = \binom{N}{k} p^k (1-p)^{N-k}.
 $$
-This figure highlights how the likelihood peaks at the observed proportion $ \hat{p} = k/N $, emphasizing the role of data in shaping the posterior.
+
+This figure highlights how the likelihood peaks at the observed proportion $ \hat{p} = k/N $.
 
 ---
 
