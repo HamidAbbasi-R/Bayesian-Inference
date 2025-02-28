@@ -1,4 +1,7 @@
 # Bayesian Inference Dashboard: Estimating Success Rates
+You can try the app on streamlit servers by clicking the link below:
+
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hamidabbasi-r-bayesian-inference-main-fjjo4a.streamlit.app/)
 
 This project provides an interactive dashboard for exploring Bayesian inference in the context of estimating success rates (e.g., hit rates, failure rates, or review ratings). The dashboard allows users to simulate data, define prior distributions, and observe how the posterior distribution updates based on observed data. It is built using Python's `streamlit`, `numpy`, `scipy.stats`, and `plotly`.
 
@@ -50,7 +53,7 @@ To run this project locally, follow these steps:
 
 OR alternatively you can run the app using streamlit servers by clicking the link below:
 
-[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://share.streamlit.io/hamidabbasi-r/bayesian-inference/main/main.py)
+[![Open in Streamlit](https://static.streamlit.io/badges/streamlit_badge_black_white.svg)](https://hamidabbasi-r-bayesian-inference-main-fjjo4a.streamlit.app/)
 
 ---
 
