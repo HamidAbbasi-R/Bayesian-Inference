@@ -2,12 +2,23 @@ import streamlit as st
 import numpy as np
 import utils
 
+
 # User inputs
-true_p = st.sidebar.slider("True Success Rate (p)", 0.0, 1.0, 0.5, step=0.01)
-N = st.sidebar.slider("Number of Trials (N)", 10, 1000, 100, step=10)
+st.sidebar.title("Binary Bayesian Inference")
+true_p = st.sidebar.slider("True Success Rate ($p_{\\text{true}}$)", 0.0, 1.0, 0.5, step=0.01)
+N = st.sidebar.slider("Number of Binary Trials ($N_b$)", 10, 1000, 100, step=10)
 seed = st.sidebar.number_input("Random Seed", value=42)
 mean_prior = st.sidebar.slider("Mean of Prior Distribution", 0.001, 0.999, 0.35, step=0.01)
 strength_prior = st.sidebar.slider("Strength of Prior Distribution", 2, 500, 100, step=1)
+st.sidebar.markdown("---")
+st.sidebar.title("Continuous Bayesian Inference")
+N_seq = st.sidebar.slider("Number of Non-binary Trials ($N_{nb}$)", 10, 1000, 100, step=10)
+mu_true = st.sidebar.slider("True Mean of Trials ($\\mu_{\\text{true}}$)", -2.0, 2.0, 0.0, step=0.1)
+sigma_true = st.sidebar.slider("True Standard Deviation of Trials ($\\sigma_{\\text{true}}$)", 0.1, 2.0, 0.5, step=0.1)
+mu_mean = st.sidebar.slider("Prior Distribution: $\mu_{\\text{mean}}$", -2.0, 2.0, 0.0, step=0.1)
+mu_std = st.sidebar.slider("Prior Distribution: $\mu_{\\text{std}}$", 0.1, 2.0, 0.5, step=0.1)
+shape = st.sidebar.slider("Prior Distribution: $\\text{shape}$", 0.1, 2.0, 1.0, step=0.1)
+rate = st.sidebar.slider("Prior Distribution: $\\text{rate}$", 0.1, 2.0, 1.0, step=0.1)
 
 
 # Streamlit app
@@ -135,7 +146,10 @@ k = np.sum(X)  # Number of successes
 
 st.plotly_chart(utils.plot_observations(X))
 
-st.plotly_chart(utils.create_likelihood_fig(true_p, N))
+# st.plotly_chart(utils.create_likelihood_fig(true_p, N))
+st.write("$k = " + str(k) + "$ successes out of $N = " + str(N) + " $ trials (observed success rate, $ \\hat{p} = " + f"{k/N:.2f}" + " $). The true success rate is $ p_{\\text{true}} = " + str(true_p) + " $.")
+st.write("Likelihood function: $P(X \mid p) = \\binom{" + str(N) + "}{" + str(k) + "} p^{" + str(k) + "} (1-p)^{" + str(N - k) + "}$")
+st.plotly_chart(utils.plot_likelihood(k, N, true_p))
 
 
 st.subheader("3. Controlling Randomness with the Seed")
@@ -150,7 +164,18 @@ For example:
 st.subheader("4. Specifying the Prior Distribution")
 st.markdown("""
 The prior distribution reflects your initial belief about the success rate before observing the data. 
-You can define it using two inputs:
+Beta distribution is a flexible choice for prior distribution because it is conjugate to the binomial likelihood.
+It is bounded between 0 and 1, making it suitable for modeling probabilities.
+It is defined as:
+            
+$$
+P(p) = \\frac{p^{\\alpha - 1} (1 - p)^{\\beta - 1}}{B(\\alpha, \\beta)}
+$$
+where:
+- $ B(\\alpha, \\beta) $: Beta function.
+- $ \\alpha, \\beta $: Shape parameters.
+
+You can define beta distribution using two inputs:
 
 - **Mean of Prior Distribution**: Use the slider to set the central tendency of the prior. 
   For example:
@@ -267,3 +292,116 @@ st.markdown("""
 Regardless of the prior belief, the mode of the posterior distribution converges to the true success rate $ p $ as the number of observations $ N $ increases. 
 This robustness to prior assumptions is a hallmark of Bayesian inference and underscores the importance of collecting sufficient data for accurate estimation.
 """)
+
+st.write("---")
+st.header("Continuous Bayesian Inference")
+st.write("""
+In the previous section, we focused on binary outcomes (success/failure).
+Now, let's explore continuous Bayesian inference, where the parameter of interest follows a continuous distribution.
+Imagine you are observing a sequence of continuous-valued data points and trying to estimate the underlying mean and standard deviation.
+
+An interesting example is estimating the mean return and volatility of a financial asset based on historical price data.
+In this example, the observations are stock returns that are continuous random variables.
+The goal is to estimate the true mean return and volatility of the asset based on the observed data.
+The assumption is that the returns follow a normal distribution with unknown mean $ \\mu $ and standard deviation $ \\sigma $.
+In a Bayesian framework:
+  - We specify prior distributions for $ \\mu $ and $ \\sigma $ based on our beliefs.
+  - We compute the likelihood of the observed data given $ \\mu $ and $ \\sigma $.
+  - We update our beliefs about $ \\mu $ and $ \\sigma $ using Bayes' theorem to obtain the posterior distribution.
+
+The Bayes theorem for continuous parameters is:
+
+$$
+P(\\mu, \\sigma \mid X) = \\frac{P(X \mid \\mu, \\sigma) P(\\mu, \\sigma)}{P(X)},
+$$
+
+where:
+- $ P(\\mu, \\sigma \mid X) $: The posterior distribution for the mean $ \\mu $ and standard deviation $ \\sigma $.
+- $ P(X \mid \\mu, \\sigma) $: The likelihood function for the normal distribution.
+- $ P(\\mu, \\sigma) $: The joint prior distribution for $ \\mu $ and $ \\sigma $.
+- $ P(X) $: The marginal likelihood, ensuring the posterior integrates to 1.
+
+To demonstrate continuous Bayesian inference, we will simulate a sequence of continuous data points $X$.
+
+$$
+X \sim \mathcal{N}(\mu, \sigma^2)
+$$
+
+where:
+- $ \\mu $: True mean of the normal distribution.
+- $ \\sigma $: True standard deviation of the normal distribution.
+
+We observe $X$, but we do not know the true values of $ \\mu $ and $ \\sigma $.
+Our goal is to estimate these parameters using Bayesian inference.
+
+Here you see the synthetic sequence of data points generated using $ \\mu_{\\text{true}}$ and $ \\sigma_{\\text{true}}$ set in the sidebar.
+""")
+
+seq = np.random.normal(loc=mu_true, scale=sigma_true, size=N_seq)
+st.plotly_chart(utils.plot_sequence(seq[:100] if len(seq) > 100 else seq))
+
+st.write("""
+Figure below shows the histogram of the observed data points.
+You can also see normal distribution based on the Maximum Likelihood Estimation (MLE) of the mean and standard deviation.
+For a given sequence, the MLE of the mean is simply the sample mean and the MLE of the standard deviation is the sample standard deviation.
+
+$$
+\\hat{\\mu} = \\frac{1}{N} \\sum_{i=1}^{N} X_i, \\quad \\hat{\\sigma} = \\sqrt{\\frac{1}{N} \\sum_{i=1}^{N} (X_i - \\hat{\\mu})^2}
+$$
+          
+""")
+st.plotly_chart(utils.plot_histogram(seq, mu_true, sigma_true))
+
+st.subheader("Prior Distributions for $ \\mu $ and $ \\sigma $, $P(\\mu, \\sigma)$")
+st.write("""
+Next, we will define the prior distributions for $ \\mu $ and $ \\sigma $.
+For simplicity, we will use normal prior distributions for \\mu and gamma prior distributions for $ \\sigma $.
+The prior distributions are defined as follows:
+- $ \\mu \\sim \\mathcal{N}(\\mu_{\\text{mean}}, \\mu_{\\text{std}}^2) $: Normal distribution for the mean.
+- $ \\sigma \\sim \\text{Gamma}(\\text{shape}, \\text{rate}) $: Gamma distribution for the standard deviation.
+         
+You can adjust the parameters $ \\mu_{\\text{mean}}, \\mu_{\\text{std}}, \\text{shape}, \\text{rate} $ in the sidebar to explore different prior distributions.
+The joint prior distribution for $ \\mu $ and $ \\sigma $ is visualized below.
+""")
+
+mu_prior, sigma_prior = utils.get_prior_distributions_normal(
+    mu_params = {
+        "mu_mean": mu_mean,
+        "mu_std": mu_std
+    },
+    sigma_params={
+        "shape": shape,
+        "rate": rate
+    })
+    
+st.plotly_chart(utils.visualize_joint_prior(mu_prior, sigma_prior, num_samples=30_000, bins=100))
+
+
+st.subheader("Likelihood Function, $P(X \mid \\mu, \\sigma)$")
+st.write("""
+Likelihood function for the normal distribution is:
+
+$$ P(X \mid \mu, \sigma) = \\prod_{i=1}^{N} \\frac{1}{\\sqrt{2\\pi\\sigma^2}} \\exp\\left(-\\frac{(X_i - \\mu)^2}{2\\sigma^2}\\right) $$
+
+where:
+- $ X_i $: Observation $ i $.
+- $ N $: Total number of observations.
+- $ \\mu $: Mean of the normal distribution.
+- $ \\sigma $: Standard deviation of the normal distribution.
+
+The likelihood function is visualized below.
+""")
+fig_likelihood, fig_posterior = utils.visualize_posterior_continuous(seq, mu_true, sigma_true, mu_prior, sigma_prior, num_bins_mu = 100, num_bins_sigma=100)
+st.plotly_chart(fig_likelihood)
+
+st.subheader("Posterior Distribution for $ \\mu $ and $ \\sigma $, $P(\\mu, \\sigma \mid X)$")
+st.write("""
+Finally, the posterior distribution for $ \\mu $ and $ \\sigma $ is computed using Bayes' theorem.
+
+$$
+P(\\mu, \\sigma \mid X) \propto P(X \mid \\mu, \\sigma) P(\\mu, \\sigma)       
+$$
+         
+The area with 95% highest posterior density is also shown with the white contour. 
+""")
+st.plotly_chart(fig_posterior)
