@@ -122,6 +122,25 @@ The posterior distribution combines the prior and likelihood to provide an updat
 ### Figure 5: Convergence of Posterior Mode
 ![Convergence of Posterior Mode](imgs/MC.png)
 
+---
+### Figure 6: Continuous Observations 
+![Continuous Observations](imgs/observations_continuous.png)
+
+---
+### Figure 7: Histogram of Continuous Observations
+![Histogram of Continuous Observations](imgs/observations_continuous_histogram.png)
+
+---
+### Figure 8: Prior Distribution for Continuous Observations
+![Prior Distribution for Continuous Observations](imgs/prior_continuous.png)
+
+---
+### Figure 9: Log-Likelihood Function for Continuous Observations
+![Log-Likelihood Function for Continuous Observations](imgs/log_likelihood_continuous.png)
+
+---
+### Figure 10: Posterior Distribution for Continuous Observations
+![Posterior Distribution for Continuous Observations](imgs/posterior_continuous.png)
 **Discussion**:  
 This figure illustrates how the posterior mode converges to the true success rate $ p $ as the number of trials $ N $ increases. Regardless of the prior, the posterior mode approaches $ p $ due to the law of large numbers. This highlights the robustness of Bayesian inference to prior assumptions when sufficient data is available.
 
